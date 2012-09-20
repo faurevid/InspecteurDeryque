@@ -67,9 +67,9 @@ $(document).ready(function() {
 	var create_perfect_box = function() {
 		var box = layout.createBox();
 
-		var data = document.createElement('div');
-		data.className = 'data';
-		box.back.appendChild(data);
+		// var data = document.createElement('div');
+		// data.className = 'data';
+		// box.back.appendChild(data);
 
 		var color = get_random_color();
 		var dark_color = color.substr(0, color.length-3)+'25%';
@@ -89,24 +89,26 @@ $(document).ready(function() {
 		box.back.appendChild(border_line);
 
 		// Statements list
-		var statements_list = newDom('div');
-		statements_list.className = 'statements_list';
+		var statements_list = newDom('div','statements_list');
 		var data_h = newDom('h2');
 		data_h.appendChild(document.createTextNode('Statements'));
 		statements_list.appendChild(data_h);
 
-		var input_statements = newDom('input');
-		input_statements.className = 'input_filter';
+		var input_statements = newDom('input', 'input_filter');
 		input_statements.setAttribute('type', 'text');
 		input_statements.setAttribute('placeholder', 'Filter');
 		layout.disableDrag(input_statements);
 
 		statements_list.appendChild(input_statements);
-		var table_statements = newDom('div');
-		table_statements.className = 'table_statements accordion';
+		var table_statements = newDom('div', 'table_statements accordion');
 		table_statements.id = 'table_statements_'+nb_boxes;
 		statements_list.appendChild(table_statements);
 		layout.disableDrag(table_statements);
+
+		var separate_button = newDom('div', 'btn btn-small btn-danger separate_button');
+		addText(separate_button, 'Bouton magique');
+		statements_list.appendChild(separate_button);
+		layout.disableDrag(separate_button);
 
 		// Filtering with regular expressions
 		$(input_statements).keyup(function() {
@@ -125,10 +127,14 @@ $(document).ready(function() {
 			});
 		});
 
+		// Separate button
+		$(separate_button).click(function() {
+			console.log("lapin", box);
+		});
+
 		box.back.appendChild(statements_list);
 
-		var input_types = newDom('div');
-		input_types.className = 'input_types';
+		var input_types = newDom('div', 'input_types');
 		var input_h = newDom('h2');
 		input_h.appendChild(document.createTextNode('Visualization'));
 		input_types.appendChild(input_h);
@@ -138,8 +144,7 @@ $(document).ready(function() {
 		box.back.appendChild(input_types);
 
 		// Close button only if necessary
-		var close_button = newDom('button');
-		close_button.className = 'close';
+		var close_button = newDom('button', 'close');
 		close_button.appendChild(document.createTextNode('×'));
 		box.back.appendChild(close_button);
 		layout.disableDrag(close_button);
@@ -314,14 +319,11 @@ $(document).ready(function() {
 		list.empty();
 		var id = list.attr('id');
 
-		var simple = newDom('div');
-		simple.className = 'accordion-group simple_statements_list';
+		var simple = newDom('div', 'accordion-group simple_statements_list');
 
-		var simpleHeading = newDom('div');
-		simpleHeading.className = 'accordion-heading';
+		var simpleHeading = newDom('div', 'accordion-heading');
 
-		var simpleBody = newDom('div');
-		simpleBody.className = 'accordion-body collapse in';
+		var simpleBody = newDom('div', 'accordion-body collapse in');
 
 		// var simpleDivTable = newDom('div');
 		var simpleTable = newDom('table');
@@ -361,22 +363,11 @@ $(document).ready(function() {
 		simple.appendChild(simpleBody);
 		list.append(simple);
 
-		// buttonSimple.setAttribute('data-parent', '.table_statements');
+		var multi = newDom('div', 'accordion-group multi_statements_list');
 
-		/*$(buttonSimple).click(function() {
-			console.log("mais euh");
-		$(simple).collapse();
-		/*{
-			parent: ".table_statements"});*});*/
+		var multiHeading = newDom('div', 'accordion-heading');
 
-		var multi = newDom('div');
-		multi.className = 'accordion-group multi_statements_list';
-
-		var multiHeading = newDom('div');
-		multiHeading.className = 'accordion-heading';
-
-		var multiBody = newDom('div');
-		multiBody.className = 'accordion-body collapse in';
+		var multiBody = newDom('div', 'accordion-body collapse in');
 
 		var multiTable = newDom('table');
 		multiBody.appendChild(multiTable);
@@ -414,17 +405,38 @@ $(document).ready(function() {
 		multi.appendChild(multiBody);
 		list.append(multi);
 
-		/*var buttonSample = newDom('button');
-		buttonSample.setAttribute('class', 'btn btn-danger');
-		buttonSample.setAttribute('data-toggle', 'collapse');
-		buttonSample.setAttribute('data-target', '#sample');
-		buttonSample.appendChild(document.createTextNode('Samples'));
-		list.append(buttonSample);
-		var sample = newDom('div');
-		sample.setAttribute('id', 'sample');
-		sample.setAttribute('class', 'collapse in ');
 
-		for (var report in json_statements_list)
+		var sample = newDom('div', 'accordion-group samples_list');
+
+		var sampleHeading = newDom('div', 'accordion-heading');
+
+		var sampleBody = newDom('div', 'accordion-body collapse in');
+
+		var sampleTable = newDom('table');
+		sampleBody.appendChild(sampleTable);
+
+		var id_sample = id + '_sample';
+		sampleBody.setAttribute('id', id_sample);
+		
+		if (json_statements_list['samples']) {
+			for (var report in json_statements_list['samples'])
+			{
+				var tr = newDom('tr');
+				var td_a = newDom('td');
+				var input = newDom('input');
+				input.setAttribute('type','checkbox');
+				input.value = report;
+				td_a.appendChild(input);
+				var td_b = newDom('td');
+				td_b.appendChild(document.createTextNode(report));
+				tr.setAttribute('data-statements', JSON.stringify(json_statements_list['samples'][report].statements))
+				tr.appendChild(td_a);
+				tr.appendChild(td_b);
+				//li.onclick = clic_statement;
+				sampleTable.appendChild(tr);
+		    }
+		}
+		/*for (var report in json_statements_list)
 		{
 		    if (typeof json_statements_list[report] === 'object' && json_statements_list[report].releve == 'sample' )
 		    {
@@ -441,9 +453,19 @@ $(document).ready(function() {
 			//li.onclick = clic_statement;
 			sample.appendChild(tr);
 		    }
-		}
-		list.append(sample);
+		}*/
+		var buttonSample = newDom('button');
+		buttonSample.appendChild(document.createTextNode('Samples'));
+		buttonSample.setAttribute('class', 'btn');
+		buttonSample.setAttribute('data-toggle', 'collapse');
+		buttonSample.setAttribute('data-parent', '#'+id);
+		buttonSample.setAttribute('data-target', '#'+id_multi);
 
+		sampleHeading.appendChild(buttonSample);
+		sample.appendChild(sampleHeading);
+		sample.appendChild(sampleBody);
+		list.append(sample);
+	/*
 		var buttonSampleMul = newDom('button');
 		buttonSampleMul.setAttribute('class', 'btn btn-danger');
 		buttonSampleMul.setAttribute('data-toggle', 'collapse');
@@ -480,28 +502,27 @@ $(document).ready(function() {
 			var checkbox = $(this).find('input');
 
 			// If the click is on the cell, and not on the checkbox
-			// if(e && e.orginalEvent && ((e.originalEvent.target && e.originalEvent.target.nodeName !== 'INPUT') ||
-			// 	(e.originalEvent.srcElement && e.originalEvent.srcElement.nodeName !== 'INPUT'))) {
-			// 	checkbox.attr('checked', checkbox.attr('checked') !== 'checked');
-			// }
 			if(e && e.originalEvent && ((e.originalEvent.target && e.originalEvent.target.nodeName !== 'INPUT') ||
 				(e.originalEvent.srcElement && e.originalEvent.srcElement.nodeName !== 'INPUT'))) {
 				checkbox.attr('checked', checkbox.attr('checked') !== 'checked');
 			}
 
 			var checked = checkbox.attr('checked') === 'checked';
-			var box = $(this).parents('.boxdiv');
-			var box_name = box.find('iframe').attr('id');
-			var statement_name = checkbox.attr('value');
+			var statements = JSON.parse(this.getAttribute('data-statements'));
 
-			console.log(this);
-			// EventBus.send((checked ? 'add': 'del') +'_statement',
-			// 	{statement_name: statement_name, box_name: box_name});
-
+			$(simple).find('tr').each(function() {
+				if (this.lastChild && this.lastChild.lastChild &&
+					statements.indexOf(this.lastChild.lastChild.data) !== -1)
+				{
+					var checkbox = $(this).find('input');
+					checkbox.attr('checked', checked);
+					checkbox.change();
+				}
+			});
 
 			dashboard_structure_management();
-
 		});
+
 		$(simple).find('tr').click(function(e){
 			var checkbox = $(this).find('input');
 
@@ -509,10 +530,15 @@ $(document).ready(function() {
 			if(e && e.originalEvent && ((e.originalEvent.target && e.originalEvent.target.nodeName !== 'INPUT') ||
 				(e.originalEvent.srcElement && e.originalEvent.srcElement.nodeName !== 'INPUT'))) {
 				checkbox.attr('checked', checkbox.attr('checked') !== 'checked');
+				checkbox.change();
 			}
+		});
+
+		$(simple).find('input').change(function() {
+			var checkbox = $(this);
 
 			var checked = checkbox.attr('checked') === 'checked';
-			var box = $(this).parents('.boxdiv');
+			var box = checkbox.parents('.boxdiv');
 			var box_name = box.find('iframe').attr('id');
 			var statement_name = checkbox.attr('value');
 
@@ -523,7 +549,7 @@ $(document).ready(function() {
 		});
 	};
 
-	// Click un a visualization
+	// Click on a visualization
 	var clic_type_statement = function() {
 		var li = $(this);
 		li.parent().find('li').removeClass('selected selected_by_default btn-inverse');
@@ -624,7 +650,7 @@ $(document).ready(function() {
 			});
 	}});
 
-	// Temporary hack
+	/*// Temporary hack
 	button_multiple = $(create_toolbar_button('Test multiple'));
 	back_buttons_bar.append(button_multiple);
 
@@ -661,24 +687,20 @@ $(document).ready(function() {
 					input.attr('checked', 'checked');
 			});
 		}
-	});
+	});*/
 
-	var alert_area = newDom('div');
-	alert_area.className = 'alert-area fade';
+	var alert_area = newDom('div', 'alert-area fade');
 	alert_area.style.display = 'none';
 	document.body.appendChild(alert_area);
 
 	EventBus.addListener('error', function(e) {
 		alert_area.style.display = 'block';
-		var alert_div = newDom('div');
-		alert_div.className = 'alert alert-error fade';
-		var alert_close = newDom('a');
-		alert_close.className = 'close';
+		var alert_div = newDom('div', 'alert alert-error fade');
+		var alert_close = newDom('a', 'close');
 		alert_close.setAttribute('data-dismiss', 'alert');
 		alert_close.appendChild(document.createTextNode('\u00d7'));
 		alert_div.appendChild(alert_close);
-		var alert_h4 = newDom('h4');
-		alert_h4.className = 'alert-heading';
+		var alert_h4 = newDom('h4', 'alert-heading');
 		alert_h4.appendChild(document.createTextNode('Error '+e.status));
 		alert_div.appendChild(alert_h4);
 		var alert_p = newDom('p');
@@ -762,11 +784,20 @@ $(document).ready(function() {
 								});
 
 								var array = data[d];
-								jbox.find('.table_statements input').each(function() {
+								jbox.find('.table_statements .simple_statements_list input').each(function() {
 									if (array.indexOf(this.getAttribute('value')) !== -1)
 										$(this).click();
 								});
 
+								jbox.find('.table_statements .multi_statements_list input').each(function() {
+									if (array.indexOf(this.getAttribute('value')) !== -1)
+										$(this).attr('checked', true);
+								});
+
+								jbox.find('.table_statements .samples_list input').each(function() {
+									if (array.indexOf(this.getAttribute('value')) !== -1)
+										$(this).attr('checked', true);
+								});
 								--disable_dashboard_structure_management;
 							}
 						}, 50);

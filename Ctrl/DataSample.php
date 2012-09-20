@@ -40,7 +40,7 @@ END;
                 new CMessage('Un relevé existe déjà avec le même nom', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
             } 
-	    else if(!(isset($POST['releve'])) and count($_POST['releve']) < 1){
+	    else if(!(isset($_POST['releve'])) and count($_POST['releve']) < 1){
 		new CMessage('Vous devez selectionner au moins une sélection', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
 

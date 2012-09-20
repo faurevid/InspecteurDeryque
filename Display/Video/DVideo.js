@@ -12,14 +12,11 @@ var DVideo = function(screen)
 	this.video.setAttribute('preload', 'auto');
 	this.screen.appendChild(this.video);
 
-	this.progressArea = newDom('div');
-	this.progressArea.className = 'progress progress-striped active';
-	this.progressBar = newDom('div');
-	this.progressBar.className = 'bar';
+	this.progressArea = newDom('div', 'progress progress-striped active');
+	this.progressBar = newDom('div', 'bar');
 	this.progressBar.style.width = '0%';
 	this.progressArea.appendChild(this.progressBar);
-	var divProgressArea = newDom('div');
-	divProgressArea.className = 'progress-area fade in';
+	var divProgressArea = newDom('div', 'progress-area fade in');
 	divProgressArea.appendChild(this.progressArea);
 	this.screen.appendChild(divProgressArea);
 
@@ -78,17 +75,7 @@ DVideo.prototype.listeners = {
 	},
 
 	bounds: function(d, obj) {
-		obj.min_time = Number.MAX_VALUE;
-		// obj.max_time = -Number.MAX_VALUE;
-
-		for (var type in d)
-		{
-			if (d[type].time_tMin < obj.min_time)
-				obj.min_time = d[type].time_tMin;
-
-			// if (d[type].time_tMax > obj.max_time)
-				// obj.max_time = d[type].time_tMax;
-		}
+		obj.min_time = d.__global__.time_tMin;
 	},
 
 	cursor: function(d, obj) {

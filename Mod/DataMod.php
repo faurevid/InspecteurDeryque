@@ -171,6 +171,9 @@ SQL
 	public static function getStatementComp() {
 		return R::getAll('select c.name, description, modname from composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id order by c.name ', [$_SESSION['bd_id']]);
 	}
+	public static function getStatementComps() {
+		return R::getAll('select c.name, r.description, modname, s.composition_id from selection s, composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id and c.id = s.composition_id order by c.name ', [$_SESSION['bd_id']]);
+	}
     public static function getStatementCompWhot($user_id) {
         return R::getAll('select c.name, m.description, GROUP_CONCAT(modname) as modname from composition c, datamod d, releve r, multi_releve m, multi_releve_releve mr where c.releve_id = m.id and m.user_id = ? and m.id = mr.multi_releve_id and r.id = mr.releve_id and r.mod_id = d.id group by c.name ', array($user_id));
     }
@@ -194,6 +197,10 @@ SQL
 	}
 	public static function getCompoMulti($name) {
 		return R::getRow('select m.id, m.name, m.description ,modname from multi_extrait m, composition r, releve v, multi_releve_extrait mr, datamod d where m.user_id = ? and v.id = r.releve_id and m.id = mr.multi_releve_id and mr.composition_id=r.id and v.mod_id = d.id and m.name=?', [$_SESSION['bd_id'], $name]);
+	}
+	
+	public static function getInfosComp($name) {
+		return R::getRow('select r.name, s.begin, s.end from releve r, selection s, composition c where c.name = ? AND c.releve_id = r.id AND c.id = s.composition_id', [$name]); 
 	}
 
 	/** Get a statement given the name and the user of that statement.

@@ -7,12 +7,10 @@ var DLED = function(screen)
 	this.screen = screen;
 
 	// Create interface
-	this.led = newDom('div');
-	this.led.className = 'led off';
+	this.led = newDom('div', 'led off');
 
-	this.legend = newDom('div');
-	this.legend.className = 'legend';
-	this.legend.appendChild(document.createTextNode('Empty'));
+	this.legend = newDom('div', 'legend');
+	addText(this.legend, 'Empty');
 	screen.appendChild(this.led);
 	screen.appendChild(this.legend);
 

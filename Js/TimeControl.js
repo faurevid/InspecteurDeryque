@@ -60,7 +60,10 @@ var TimeControl = function() {
 	this.cursor_time = 0;
 
 	// The slider width when dragging
-	var drag_width = 0;
+	this.drag_width = 0;
+
+	// The synchronization interface is displayed ?
+	this.synchro_interface = false;
 
 	this.animate_interface();
 
@@ -94,11 +97,9 @@ create_interface: function() {
 	this.time_control.className = 'disabled';
 	document.body.appendChild(this.time_control);
 
-	var time_buttons = newDom('div');
-	time_buttons.className = 'time_buttons btn-group';
+	var time_buttons = newDom('div', 'time_buttons btn-group');
 
-	this.bti = newDom('button');
-	this.bti.className = 'btn btn-mini btn-inverse';
+	this.bti = newDom('button', 'btn btn-mini btn-inverse');
 	this.bti_icon = newDom('i');
 	this.bti_icon_play_class = 'icon-play icon-white';
 	this.bti_icon_pause_class = 'icon-pause icon-white';
@@ -106,24 +107,20 @@ create_interface: function() {
 	this.bti.appendChild(this.bti_icon);
 	time_buttons.appendChild(this.bti);
 
-	this.reduce_button = newDom('button');
-	this.reduce_button.className = 'btn btn-mini btn-inverse';
-	var reduce_button_icon = newDom('i');
-	reduce_button_icon.className = 'icon-resize-small icon-white';
+	this.reduce_button = newDom('button', 'btn btn-mini btn-inverse');
+	var reduce_button_icon = newDom('i', 'icon-resize-small icon-white');
 	this.reduce_button.appendChild(reduce_button_icon);
 	time_buttons.appendChild(this.reduce_button);
 
-	this.expand_button = newDom('button');
-	this.expand_button.className = 'btn btn-mini btn-inverse';
-	var expand_button_icon = newDom('i');
-	expand_button_icon.className = 'icon-resize-full icon-white';
+	this.expand_button = newDom('button', 'btn btn-mini btn-inverse');
+	var expand_button_icon = newDom('i', 'icon-resize-full icon-white');
 	this.expand_button.appendChild(expand_button_icon);
 	time_buttons.appendChild(this.expand_button);
 
-	this.speed_button = newDom('button');
-	this.speed_button.className = 'btn btn-mini btn-inverse';
+	this.speed_button = newDom('button', 'btn btn-mini btn-inverse');
 	this.speed_button.appendChild(document.createTextNode('x1'));
 	time_buttons.appendChild(this.speed_button);
+
 
 	//Extraction
 	this.extrac_button = newDom('button');
@@ -133,46 +130,44 @@ create_interface: function() {
 	this.extrac_button.appendChild(extrac_button_icon);
 	time_buttons.appendChild(this.extrac_button);
 
-	this.time_info = newDom('button');
+	/*this.time_info = newDom('button');
 	this.time_info.className = 'btn btn-mini time_info';
+	*/
+	this.time_info = newDom('button', 'btn btn-mini time_info');
 	this.time_info.appendChild(document.createTextNode('12:45:12.054'));
 	time_buttons.appendChild(this.time_info);
 
 	this.time_control.appendChild(time_buttons);
 
-	// Creation of the sliderc
+
+/*	// Creation of the sliderc
 	var zone_slider = newDom('div');
 	zone_slider.className = "zone_slider";
+*/	// Creation of the slider
+	var zone_slider = newDom('div', 'zone_slider');
 	this.time_control.appendChild(zone_slider);
 	this.jslider = $(zone_slider);
 
-	this.area = newDom('div');
-	this.area.className = 'area';
+	this.area = newDom('div', 'area');
 	zone_slider.appendChild(this.area);
 
-	this.border_left = newDom('div');
-	this.border_left.className = 'border border_left';
+	this.border_left = newDom('div', 'border border_left');
 	this.area.appendChild(this.border_left);
 
-	this.border_right = newDom('div');
-	this.border_right.className = 'border border_right';
+	this.border_right = newDom('div', 'border border_right');
 	this.area.appendChild(this.border_right);
 
 	// Creation of the tooltip
-	this.tooltip = newDom('div');
-	this.tooltip.className = 'tooltip top';
-	this.tooltip_arrow = newDom('div');
-	this.tooltip_arrow.className = 'tooltip-arrow';
-	this.tooltip_inner = newDom('div');
-	this.tooltip_inner.className = 'tooltip-inner';
+	this.tooltip = newDom('div', 'tooltip top');
+	this.tooltip_arrow = newDom('div', 'tooltip-arrow');
+	this.tooltip_inner = newDom('div', 'tooltip-inner');
 	this.tooltip_inner.appendChild(document.createTextNode('coucou'));
 	this.tooltip.appendChild(this.tooltip_arrow);
 	this.tooltip.appendChild(this.tooltip_inner);
 	document.body.appendChild(this.tooltip);
 
 	// Creation of the time cursor
-	this.time_cursor = newDom('div');
-	this.time_cursor.className = 'time_cursor';
+	this.time_cursor = newDom('div', 'time_cursor');
 	this.area.appendChild(this.time_cursor);
 },
 
@@ -305,28 +300,33 @@ animate_interface: function() {
 		var name_selec = prompt("Choose a name for your selection:", "");
 		if(name_selec != "")
 		{
+			if(name_selec){
 
-			EventBus.listenOneTime('bounds', function(bounds)
-			{
-				var t = obj.get_times_by_pos();
-
-				for (var k in bounds)
+				EventBus.listenOneTime('bounds', function(bounds)
 				{
-					if (k !== '__global__')
-					{
-						var time_min_selec = t.start_t >= bounds.__global__.time_tMin ?
-							t.start_t : bounds.__global__.time_tMin;
-							
-						var time_max_selec = t.end_t >= bounds.__global__.time_tMax ?
-							t.end_t : bounds.__global__.time_tMax;
-						
-						obj.send_selection(name_selec, time_max_selec, time_min_selec, k);
-					}
-				}
-				
-			});
+					var t = obj.get_times_by_pos();
 
-			EventBus.send('get_bounds');
+					for (var k in bounds)
+					{
+						if (k !== '__global__')
+						{
+							var time_min_selec = t.start_t >= bounds.__global__.time_tMin ?
+								t.start_t : bounds.__global__.time_tMin;
+							
+							var time_max_selec = t.end_t >= bounds.__global__.time_tMax ?
+								t.end_t : bounds.__global__.time_tMax;
+						
+							obj.send_selection(name_selec, time_max_selec, time_min_selec, k);
+						}
+					}
+				
+				});
+
+				EventBus.send('get_bounds');
+			}
+		}
+		else{
+			alert("Veuillez donner un nom à votre sélection");
 		}
 	});
 
@@ -662,7 +662,119 @@ send_selection: function(name_s, min_s, max_s, statement_name){
 		max_s : max_s,
 		statement_name : statement_name
 	});
+},
+create_synchro_interface: function(d, obj) {
 
+	this.synchro_area = newDom('div', 'synchro_area modal hide fade in');
+	var closeButton = newDom('button', 'close');
+	closeButton.setAttribute('type', 'button');
+	closeButton.setAttribute('data-dismiss', 'modal');
+	addText(closeButton, '×');
+
+	var table = newDom('table', 'table table-striped table-bordered');
+	var thead = newDom('thead');
+	thead_tr = newDom('tr');
+	var th_name = newDom('th');
+	addText(th_name, 'Name');
+	var th_begin = newDom('th');
+	addText(th_begin, 'Begin');
+	var th_end = newDom('th');
+	addText(th_end, 'End');
+	var th_shift = newDom('th');
+	addText(th_shift, 'Shift');
+	thead_tr.appendChild(th_name);
+	thead_tr.appendChild(th_begin);
+	thead_tr.appendChild(th_end);
+	thead_tr.appendChild(th_shift);
+	thead.appendChild(thead_tr);
+	table.appendChild(thead);
+
+	var tbody = newDom('tbody');
+	table.appendChild(tbody);
+
+	this.synchro_area.appendChild(closeButton);
+	this.synchro_area.appendChild(table);
+	document.body.appendChild(this.synchro_area);
+
+	this.synchro_interface = true;
+
+	EventBus.send('get_bounds');
+
+	var modal = $(this.synchro_area);
+	modal.modal({
+		keyboard: true,
+		backdrop: true,
+		show: false
+	});
+},
+
+fill_synchro_interface: function(bounds) {
+	console.log(bounds);
+	var table = this.synchro_area.lastChild.lastChild;
+	for (var k in bounds)
+	{
+		if (k !== '__global__')
+		{
+			var line = newDom('tr');
+			var name = newDom('th');
+			var hname = newDom('span');
+			addText(hname, k);
+			name.appendChild(hname);
+
+			var inputBegin = newDom('input');
+			inputBegin.setAttribute('type', 'number');
+			var vBegin = bounds[k].time_tMin;
+			inputBegin.setAttribute('data-init', vBegin);
+			inputBegin.value = vBegin;
+			var tdBegin = newDom('td');
+			tdBegin.appendChild(inputBegin);
+			$(inputBegin).change(function() {
+				var old_time = parseInt(this.getAttribute('data-init'));
+				var new_time = parseInt(this.value);
+				var diff = new_time - old_time;
+				var inputs = $(this).parent().parent().find('input');
+				inputs[1].value = parseInt(inputs[1].getAttribute('data-init')) + diff;
+				inputs[2].value = diff;
+			});
+
+			var inputEnd = newDom('input');
+			inputEnd.setAttribute('type', 'number');
+			var vEnd = bounds[k].time_tMax;
+			inputEnd.setAttribute('data-init', vEnd);
+			inputEnd.value = vEnd;
+			var tdEnd = newDom('td');
+			tdEnd.appendChild(inputEnd);
+			$(inputEnd).change(function() {
+				var old_time = parseInt(this.getAttribute('data-init'));
+				var new_time = parseInt(this.value);
+				var diff = new_time - old_time;
+				var inputs = $(this).parent().parent().find('input');
+				inputs[0].value = parseInt(inputs[0].getAttribute('data-init')) + diff;
+				inputs[2].value = diff;
+			});
+
+			var inputShift = newDom('input');
+			inputShift.setAttribute('type', 'number');
+			inputShift.value = '0';
+			var tdShift = newDom('td');
+			tdShift.appendChild(inputShift);
+			$(inputShift).change(function() {
+				var diff = parseInt(this.value);
+				var inputs = $(this).parent().parent().find('input');
+				inputs[0].value = parseInt(inputs[0].getAttribute('data-init')) + diff;
+				inputs[1].value = parseInt(inputs[1].getAttribute('data-init')) + diff;
+			});
+
+			line.appendChild(name);
+			line.appendChild(tdBegin);
+			line.appendChild(tdEnd);
+			line.appendChild(tdShift);
+
+			table.appendChild(line);
+		}
+	}
+
+	$(this.synchro_area).modal('show');
 },
 
 listeners: {
@@ -719,6 +831,9 @@ bounds: function(d, obj) {
 	obj.time_max = d.__global__.time_tMax;
 	obj.initial_time_min = obj.time_min;
 	obj.initial_time_max = obj.time_max;
+
+	if (obj.synchro_interface)
+		obj.fill_synchro_interface(d);
 },
 
 add_statement: function(e, obj) {
@@ -773,7 +888,7 @@ pause: function(e, obj) {
 play_speed: function(d, obj) {
 	obj.current_play_speed = d.speed;
 	obj.speed_button.firstChild.data = 'x'+d.speed;
-}
+},
 
 
 }};

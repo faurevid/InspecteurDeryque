@@ -32,7 +32,7 @@ class RestJson
     public function reports(){
     	$statements_simple = DataMod::getStatements();
 		$statements_multi = DataMod::getMultiStatements();
-		$statements_comp = DataMod::getStatementComp();
+		$statements_comp = DataMod::getStatementComps();
 		$statements_comp_multi = DataMod::getStatementCompMulti();
 
     	$response = [];
@@ -60,6 +60,23 @@ class RestJson
 			}
 	    	$response['multiples'] = $r;
 	    }
+	    
+	    if (count($statements_comp))
+	    {
+	    	$r = [];
+	    	foreach($statements_comp as $s)
+	    	{
+	    		if($s['composition_id']){
+		    		$i = Datamod::getInfosComp($s['name']);
+		    		$r[$s['name']] = [
+		    			'desc' => $s['description'],
+		    			'statement' => $i['name'],
+		    			'begin' => $i['begin'],
+		    			'end' => $i['end']];
+	    		}
+	    	}
+	    	$response['samples'] = $r;
+	    }
 
     	// foreach($reports as $report){
     	// 	$arr[$report['name']] = ['desc'  => $report['description'], 'releve' => 'simple'];
@@ -78,8 +95,6 @@ class RestJson
     * sends a Json message which contains a resume of a user's report
     */
     public function resume(){
-
-    	sleep(1);
 		$reports = DataMod::getStatements();
 		if(isset($_REQUEST['INFOS'][2])){
 			$report = DataMod::getStatement($_REQUEST['INFOS'][2]);
@@ -311,26 +326,26 @@ class RestJson
 	$simple=DataMod::getStatements();
 	$multi=DataMod::getStatementsMulti();
 	foreach($simple as $sim){
-		if($name_s === $sim['name']) 
+		if($name_s == $sim['name']) 
 		{
 				$error = new Error();
 				$error->teapot();
 				return;
 		}
-		if($statement_name===$sim['name'])
+		if($statement_name==$sim['name'])
 		{
 			$id_s = $sim['id'];			
 			$type_s = 'releve';
 		}
 	}	
 	foreach($multi as $mul){
-		if($name_s === $mul['name']) 
+		if($name_s ==$mul['name']) 
 		{
 				$error = new Error();
 				$error->teapot();
 				return;
 		}
-		if($statement_name===$mul['name'])
+		if($statement_name==$mul['name'])
 		{
 			$id_s = $mul['id'];			
 			$type_s = 'multi';

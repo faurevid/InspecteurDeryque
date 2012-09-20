@@ -20,13 +20,11 @@ var DLineChart = function(screen)
 	this.screen.appendChild(this.screenGraph);
 
 	// Create legend
-	this.legend_area = newDom('ul');
-	this.legend_area.className = 'legend';
+	this.legend_area = newDom('ul', 'legend');
 	this.screen.appendChild(this.legend_area);
 
 	// Create time cursor
-	this.time_cursor = newDom('div');
-	this.time_cursor.className = 'time_cursor';
+	this.time_cursor = newDom('div', 'time_cursor');
 	this.screen.appendChild(this.time_cursor);
 
 	this.database = {};
@@ -61,8 +59,32 @@ var DLineChart = function(screen)
 	// Time value of the cursor
 	this.cursor_time_t = 0;
 
-	// Create the legend
+	// Create the legend
 	this.createLegend();
+
+	// Manage mouse actions on the line chart
+	var jscreen = $(screen);
+	var obj = this;
+	jscreen.mousedown(function(e) {
+		obj.mousedown = true;
+		obj.cursorMove(e);
+	});
+	jscreen.mousemove(function(e) {
+		obj.cursorMove(e);
+	});
+	jscreen.mouseup(function(){
+		obj.mousedown = false;
+	});
+
+	screen.onselectstart = noNo;
+
+	// Min and max time for mousewheel support
+	this.min_t = 0;
+	this.max_t = 1;
+
+	jscreen.mousewheel(function(e, delta) {
+		obj.zoom(delta > 0);
+	});
 };
 
 DLineChart.prototype =
@@ -72,27 +94,24 @@ createLegend: function() {
 	var buttons_area = newDom('div');
 	buttons_area.className = 'btn-group';
 	var obj = this;
-	var btn = newDom('a');
-	btn.className = 'btn btn-mini';
-	btn.appendChild(document.createTextNode('Multi scale'));
+	var btn = newDom('a', 'btn btn-mini');
+	addText(btn, 'Multi scale');
 	btn.onclick = function(){
 		obj.multi_scale = !obj.multi_scale;
 		this.className = obj.multi_scale ? 'btn btn-mini btn-inverse' : 'btn btn-mini';
 		EventBus.send('get_tuples');
 	};
 	buttons_area.appendChild(btn);
-	btn = newDom('a');
-	btn.className = 'btn btn-mini';
-	btn.appendChild(document.createTextNode('Fill'));
+	btn = newDom('a', 'btn btn-mini');
+	addText(btn,  'Fill');
 	btn.onclick = function(){
 		obj.fill_lines = !obj.fill_lines;
 		this.className = obj.fill_lines ? 'btn btn-mini btn-inverse' : 'btn btn-mini';
 		EventBus.send('get_tuples');
 	};
 	buttons_area.appendChild(btn);
-	btn = newDom('a');
-	btn.className = 'btn btn-mini';
-	btn.appendChild(document.createTextNode('Points'));
+	btn = newDom('a', 'btn btn-mini');
+	addText(btn, 'Points');
 	btn.onclick = function(){
 		obj.points = !obj.points;
 		this.className = obj.points ? 'btn btn-mini btn-inverse' : 'btn btn-mini';
@@ -402,13 +421,47 @@ paintCursor: function() {
 
 	if (x_pos < 0)
 		x_pos = 0;
-	else if (x_pos > this.width)
-		xpos = this.width;
+	else if (x_pos >= this.width)
+		xpos = this.width-1;
 
 	x_pos += 'px';
 
 	if (this.time_cursor.style.left != x_pos)
 		this.time_cursor.style.left = x_pos;
+},
+
+cursorMove: function(e) {
+	if (this.mousedown)
+	{
+		var time_t = e.clientX / this.coef_x + this.x_min;
+
+		if (time_t !== this.cursor_time_t)
+			EventBus.send('cursor', {time_t: time_t});
+	}
+},
+
+zoom: function(zoomIn) {
+
+	var period = this.x_max - this.x_min;
+
+	var left_coef = (this.cursor_time_t - this.x_min) / period;
+	var right_coef = (this.x_max - this.cursor_time_t) / period;
+
+	period *= zoomIn ? 0.766 : 1.332;
+
+	var start_t = this.cursor_time_t - period * left_coef;
+	var end_t = this.cursor_time_t + period * right_coef;
+
+	if (start_t < this.min_t)
+		start_t = this.min_t;
+
+	if (end_t > this.max_t)
+		end_t = this.max_t;
+
+	EventBus.send('time_sync', {
+		start_t: start_t,
+		end_t: end_t
+	});
 },
 
 clear: function(noClearCanvas) {
@@ -425,6 +478,14 @@ clear: function(noClearCanvas) {
 },
 
 listeners: {
+	bounds: function(d, obj)
+	{
+		// store min and max time
+		// for mousewheel support
+		obj.min_t = d.__global__.time_tMin;
+		obj.max_t = d.__global__.time_tMax;
+	},
+
 	time_sync: function(d, obj)
 	{
 		obj.x_min = d.start_t;
@@ -458,7 +519,7 @@ listeners: {
 						var legend = newDom('li');
 						legend.id = id_legend;
 						legend.style.color = obj.colors[(lines_to_draw.length-1)%obj.colors.length];
-						legend.appendChild(document.createTextNode(statement_name + ' : ' + k));
+						addText(legend, statement_name + ' : ' + k);
 						obj.legend_area.appendChild(legend);
 					}
 				}
@@ -506,7 +567,10 @@ listeners: {
 		if (e.box_name != self.name) return;
 
 		if (e.statement_name in obj.database)
+		{
+			$(obj.legend_area).empty();
 			delete obj.database[e.statement_name];
+		}
 	},
 
 	// Gestion de la taille du graphe

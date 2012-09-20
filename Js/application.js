@@ -10,9 +10,12 @@ var _ = function(chaine)
 	return chaine;
 };
 
-var newDom = function(nom)
+var newDom = function(nom, className)
 {
-	return document.createElement(nom);
+	var dom = document.createElement(nom);
+	if (typeof className !== 'undefined')
+		dom.className = className;
+	return dom;
 };
 
 var delDom = function(element)
@@ -29,6 +32,11 @@ var emptyDom = function(element)
 	{
 		element.removeChild(element.firstChild);
 	};
+};
+
+var addText = function(element, text)
+{
+	element.appendChild(document.createTextNode(text));
 };
 
 var delChar = function(chaine, caractere)

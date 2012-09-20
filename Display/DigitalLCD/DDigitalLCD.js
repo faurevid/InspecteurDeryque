@@ -50,17 +50,14 @@ listeners: {
 					// console.log(id);
 					var box = byId(id);
 					if (!box) {
-						box = newDom('div');
+						box = newDom('div', 'lcd_box');
 						box.id = id;
-						box.className = 'lcd_box';
 						var value = newDom('span');
-						value.appendChild(document.createTextNode(''));
-						var div_name = newDom('div');
-						div_name.className = 'name';
-						div_name.appendChild(document.createTextNode(statement_name));
-						var div_key = newDom('div');
-						div_key.className = 'key';
-						div_key.appendChild(document.createTextNode(k));
+						addText(value, '');
+						var div_name = newDom('div', 'name');
+						addText(div_name, statement_name);
+						var div_key = newDom('div', 'key');
+						addText(div_key, k);
 						box.appendChild(value);
 						box.appendChild(div_name);
 						box.appendChild(div_key);
