@@ -51,6 +51,7 @@ class Error
 		CNavigation::setTitle('Error 401');
 		ErrorView::showError(401, 'Authentification required', '401_polytech.jpg');
 	}
+	
 }
 
 ?>

@@ -10,7 +10,7 @@ class Data
 
 
 	public function index() {
-		CNavigation::setTitle(_('Simple statements'));
+		CNavigation::setTitle(_('Statements'));
 		CNavigation::setDescription(_('All your data are belong to us'));
 
 		$simple_statements = DataMod::getStatements();
@@ -67,7 +67,7 @@ class Data
 			// If it's not an update
 			if ($old_statement && $old_statement['id'] != $_REQUEST['old_id'])
 			{
-				new CMessage(_('A statement already exist with the same name'), 'error');
+				new CMessage(_('A statement already exists with the same name'), 'error');
 			}
 			else
 			{
@@ -87,7 +87,7 @@ class Data
 					// if the old statement is wrong
 					if (!$statement)
 					{
-						new CMessage(_('You had asked to edit an unknown statement. Creating a new statement.'),
+						new CMessage(_('You are trying to edit an unknown statement. Creating a new statement.'),
 							'warning');
 						// Create a new statement
 						$mode = 'add';
@@ -154,7 +154,7 @@ class Data
 				else
 				{
 					// If it's an update, show the updated statement
-					new CMessage(_('Successfull update'));
+					new CMessage(_('Successfully updated'));
 					CNavigation::redirectToApp('Data', 'view', ['name' => $statement->name]);
 				}
 			}

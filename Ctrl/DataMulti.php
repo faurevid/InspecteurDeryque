@@ -33,12 +33,12 @@ class DataMulti {
 			// If it's not an update
 			if ($old_statement && $old_statement['id'] != $_REQUEST['old_id'])
 			{
-				new CMessage(_('A multiple statement already exist with the same name'), 'error');
+				new CMessage(_('A multiple statement already exists with the same name'), 'error');
 			}
 			// If the user have selected no one statement…
 			else if(count($_REQUEST['releve']) < 1)
 			{
-				new CMessage(_('You have to select one or more statements'), 'error');
+				new CMessage(_('You have to choose at least one statement'), 'error');
 			}
 			else
 			{
@@ -58,7 +58,7 @@ class DataMulti {
 					// if the old multiple statement is wrong
 					if (!$statement)
 					{
-						new CMessage(_('You had asked to edit an unknown multiple statement. Creating a new multiple statement.'),
+						new CMessage(_('You are trying to edit an unknown multiple statement. Creating a new multiple statement.'),
 							'warning');
 						// Create a new multiple statement
 						$mode = 'add';
@@ -108,10 +108,10 @@ class DataMulti {
 		// If the form is submited, but a value is absent
 		else if (CNavigation::isPost())
 			// In the majority of case, it's an absence of selected statements
-			new CMessage(_('You have to select one or more statements'), 'error');
+			new CMessage(_('You have to choose at least one statement'), 'error');
 
 		CNavigation::setTitle('New multiple statement');
-		CNavigation::setDescription('Select the statements which you want to compose');
+		CNavigation::setDescription('Select the statements that you want to compose');
 
 		// Show the form, with default values management
 		DataMultiView::showAddForm(array_merge([

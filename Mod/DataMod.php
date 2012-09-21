@@ -172,14 +172,14 @@ SQL
 		return R::getAll('select c.name, description, modname from composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id order by c.name ', [$_SESSION['bd_id']]);
 	}
 	public static function getStatementComps() {
-		return R::getAll('select c.name, r.description, modname, s.composition_id from selection s, composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id and c.id = s.composition_id order by c.name ', [$_SESSION['bd_id']]);
+		return R::getAll('select c.name, c.releve_id, r.description, modname, s.composition_id from selection s, composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id and c.id = s.composition_id order by c.name ', [$_SESSION['bd_id']]);
 	}
     public static function getStatementCompWhot($user_id) {
         return R::getAll('select c.name, m.description, GROUP_CONCAT(modname) as modname from composition c, datamod d, releve r, multi_releve m, multi_releve_releve mr where c.releve_id = m.id and m.user_id = ? and m.id = mr.multi_releve_id and r.id = mr.releve_id and r.mod_id = d.id group by c.name ', array($user_id));
     }
 
 	public static function getStatementCompo($name) {
-		return R::getAll('select c.name, description, modname from composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id and c.name=? ', [$_SESSION['bd_id'], $name]);
+		return R::getAll('select c.name, description, modname, c.id from composition c, datamod d, releve r where r.user_id = ? and r.id = c.releve_id and r.mod_id = d.id and c.name=? ', [$_SESSION['bd_id'], $name]);
 	}
 
 	public static function getStatementCompWithId() {

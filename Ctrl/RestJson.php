@@ -361,7 +361,7 @@ class RestJson
 
 
 	$selection = R::dispense('selection');
-
+	
         $selection->releve_type = $type_s;
         $selection->releve_id = $id_s;
         $selection->begin = $_REQUEST['INFOS'][3];

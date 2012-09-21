@@ -117,6 +117,11 @@ create_interface: function() {
 	this.expand_button.appendChild(expand_button_icon);
 	time_buttons.appendChild(this.expand_button);
 
+	/*this.extrac_button = newDom('button', 'btn btn-mini btn-inverse');
+	var extrac_button_icon = newDom('i', 'icon-filter icon-white');
+	this.extrac_button.appendChild(extrac_button_icon);
+	time_buttons.appendChild(this.extrac_button);*/
+
 	this.speed_button = newDom('button', 'btn btn-mini btn-inverse');
 	this.speed_button.appendChild(document.createTextNode('x1'));
 	time_buttons.appendChild(this.speed_button);
@@ -133,9 +138,11 @@ create_interface: function() {
 	/*this.time_info = newDom('button');
 	this.time_info.className = 'btn btn-mini time_info';
 	*/
+	
 	this.time_info = newDom('button', 'btn btn-mini time_info');
 	this.time_info.appendChild(document.createTextNode('12:45:12.054'));
 	time_buttons.appendChild(this.time_info);
+
 
 	this.time_control.appendChild(time_buttons);
 
@@ -296,7 +303,7 @@ animate_interface: function() {
 
 	//Extraction
 	$(this.extrac_button).click(function() {
-		
+
 		var name_selec = prompt("Choose a name for your selection:", "");
 		if(name_selec != "")
 		{
@@ -313,20 +320,31 @@ animate_interface: function() {
 							var time_min_selec = t.start_t >= bounds.__global__.time_tMin ?
 								t.start_t : bounds.__global__.time_tMin;
 							
-							var time_max_selec = t.end_t >= bounds.__global__.time_tMax ?
+							var time_max_selec = t.end_t <= bounds.__global__.time_tMax ?
 								t.end_t : bounds.__global__.time_tMax;
 						
-							obj.send_selection(name_selec, time_max_selec, time_min_selec, k);
+							obj.send_selection(name_selec, time_min_selec, time_max_selec, k);
 						}
 					}
 				
 				});
+/*						var time_min_selec = t.start_t >= bounds.__global__.time_tMin ?
+							t.start_t : bounds.__global__.time_tMin;
+
+						var time_max_selec = t.end_t >= bounds.__global__.time_tMax ?
+							t.end_t : bounds.__global__.time_tMax;
+
+						obj.send_selection(name_selec, time_max_selec, time_min_selec, k);
+					}
+				}
+
+			});*/
 
 				EventBus.send('get_bounds');
 			}
 		}
 		else{
-			alert("Veuillez donner un nom à votre sélection");
+			alert("Please give a name to your selection");
 		}
 	});
 
@@ -775,6 +793,18 @@ fill_synchro_interface: function(bounds) {
 	}
 
 	$(this.synchro_area).modal('show');
+},
+
+//Extraction
+send_selection: function(name_s, min_s, max_s, statement_name){
+
+	EventBus.send('send_selection', {
+		name_s : name_s,
+		min_s : min_s,
+		max_s : max_s,
+		statement_name : statement_name
+	});
+
 },
 
 listeners: {

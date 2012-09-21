@@ -11,7 +11,7 @@ class DataSampleView extends AbstractView {
         $url_multi = CNavigation::generateUrlToApp('DataSample','choosemulti');
         echo '<div class="well">';
         self::showButton($url, 'primary', 'Nouvel extrait', 'plus');
-	self::showButton($url_multi, 'primary', 'Nouveau multi extrait', 'plus');
+	self::showButton($url_multi, 'primary', 'New multi sample', 'plus');
         echo '</div>';
     }
 
@@ -23,10 +23,10 @@ class DataSampleView extends AbstractView {
      */
     public static function showViewButtons($url_back, $url_change, $url_comp, $url_del) {
         echo '<div class="well">';
-        self::showButton($url_back, 'info', 'Retour à la liste', 'back');
-        self::showButton($url_change, 'info', 'Modifier l\'extrait', 'change');
+        self::showButton($url_back, 'info', 'Back to the list', 'back');
+        self::showButton($url_change, 'info', 'Update', 'change');
 	self::showButton($url_comp, 'success', _('Composition'), 'magnify');
-        self::showButton($url_del, 'danger', 'Supprimer l\'extrait', 'del');
+        self::showButton($url_del, 'danger', 'Delete', 'del');
         echo '</div>';
     }
 /**
@@ -35,7 +35,7 @@ class DataSampleView extends AbstractView {
  */
     public static function showBackButtons($url_back) {
         echo '<div class="well">';
-        self::showButton($url_back, 'info', 'Retour à la liste', 'back');
+        self::showButton($url_back, 'info', 'Back to the list', 'back');
         echo '</div>';
     }
 
@@ -75,8 +75,8 @@ END;
             CHead::addJS('jquery.tablesorter.min');
             echo <<<END
             <table class="table table-striped table-bordered data_list">
-                                 <thead><tr><b>Relevés simples</b>
-                                 <th class="header yellow">Nom</th>
+                                 <thead><tr><b>Simple statements</b>
+                                 <th class="header yellow">Name</th>
                                                <th class="header green">Description</th>
                                                              <th class="header blue">Type</th>
                                                                            </tr></thead>
@@ -95,7 +95,7 @@ END;
         } else {
             echo <<<END
             <div class="alert  alert-block alert-warning">
-                               <p>Il n'y a aucun relevé pour l'instant.</p>
+                               <p>There is no statement.</p>
                                </div>
 
                                    
@@ -107,8 +107,8 @@ END;
             CHead::addJS('jquery.tablesorter.min');
             echo <<<END
             <table class="table table-striped table-bordered data_list">
-                                 <thead><tr> <b>Relevés multiples</b>
-                                 <th class="header yellow">Nom</th>
+                                 <thead><tr> <b>Multiple statements</b>
+                                 <th class="header yellow">Name</th>
                                                <th class="header green">Description</th>
                                                              <th class="header blue">Type</th>
                                                                            </tr></thead>
@@ -127,7 +127,7 @@ END;
         } else {
             echo <<<END
             <div class="alert  alert-block alert-warning">
-                               <p>Il n'y a aucun relevé pour l'instant.</p>
+                               <p>There is no statement.</p>
                                </div>
 
                                    
@@ -140,10 +140,10 @@ END;
      */
     public static function showAddFormFromSelect() {
 
-        $label_name = _('Nom');
+        $label_name = _('Name');
         $label_desc = _('Description');
         $url_submit = CNavigation::generateUrlToApp('DataSample', 'addSelect');
-        $text_submit = _('Créer le relevé extrait');
+        $text_submit = _('Create the sample');
         /*$hname = htmlspecialchars($values['name']);
         $hdesc = htmlspecialchars($values['desc']);*/
         $statements = DataMod::getStatementCompWithId($_SESSION['bd_id']);
@@ -195,10 +195,10 @@ END;
      * Displays the list of samples that can be used to create a new multi sample.
      */
     public static function showMultiForm($values) {
-        $label_name = _('Nom');
+        $label_name = _('Name');
         $label_desc = _('Description');
         $url_submit = CNavigation::generateUrlToApp('DataSample', 'addMulti');
-        $text_submit = _('Créer le multi relevé extrait');
+        $text_submit = _('Create the sample');
         $hname = htmlspecialchars($values['name']);
         $hdesc = htmlspecialchars($values['desc']);
         $statements = DataMod::getStatementCompWithId($_SESSION['bd_id']);
@@ -258,13 +258,13 @@ END;
 }
 
 public static function showRelForm($values) {
-        $label_name = _('Nom');
-        $label_debut = _('Debut');
-        $label_fin = _('Fin');
+        $label_name = _('Name');
+        $label_debut = _('Begin');
+        $label_fin = _('End');
 	$rel = DataMod::getStatement($_REQUEST['name'], $_SESSION['bd_id']);
 	$id=$rel['id'];
         $url_submit = CNavigation::generateUrlToApp('DataSample', 'addSelect', array('type' => 'releve', 'id_rel' => $id));
-        $text_submit = _('Créer la sélection');
+        $text_submit = _('Create the selection');
         $hname = htmlspecialchars($_REQUEST['name']);
         
 
@@ -303,13 +303,13 @@ END;
 
 
 public static function showRelMultiForm($values) {
-        $label_name = _('Nom');
-        $label_debut = _('Debut');
-        $label_fin = _('Fin');
+        $label_name = _('Name');
+        $label_debut = _('Begin');
+        $label_fin = _('End');
 	$rel = DataMod::getStatementMulti($_REQUEST['name'], $_SESSION['bd_id']);
 	$id=$rel['id'];
         $url_submit = CNavigation::generateUrlToApp('DataSample', 'addSelectMul', array('type' => 'multi_releve', 'id_rel' => $id));
-        $text_submit = _('Créer la sélection');
+        $text_submit = _('Create the selection');
         $hname = htmlspecialchars($_REQUEST['name']);
         
 
@@ -347,11 +347,11 @@ END;
 }
 
 public static function showSelectForm($values) {
-        $label_name = _('Nom');
+        $label_name = _('Name');
 	$rel = DataMod::getStatement($_REQUEST['name'], $_SESSION['bd_id']);
 	$id=$rel['id'];
         $url_submit = CNavigation::generateUrlToApp('DataSample', 'add', array('id_rel' => $id));
-        $text_submit = _('Créer le relevé extrait');
+        $text_submit = _('Create the sample');
         $statements = DataMod::getSelection($_SESSION['bd_id'], $_REQUEST['name']);
 
         echo <<<END
@@ -393,11 +393,11 @@ END;
 }
 
 public static function showSelectMultiForm($values) {
-        $label_name = _('Nom');
+        $label_name = _('Name');
 	$rel = DataMod::getStatementMulti($_REQUEST['name'], $_SESSION['bd_id']);
 	$id=$rel['id'];
         $url_submit = CNavigation::generateUrlToApp('DataSample', 'addComp', array('id_rel' => $id));
-        $text_submit = _('Créer le relevé extrait');
+        $text_submit = _('Create the sample');
         $statements = DataMod::getSelectionMul($_SESSION['bd_id'], $_REQUEST['name']);
 
         echo <<<END
@@ -444,10 +444,10 @@ END;
  */
 public static function showChangeForm($values) {
 
-    $label_name = _('Nom');
+    $label_name = _('Name');
     $label_desc = _('Description');
     $url_submit = CNavigation::generateUrlToApp('DataSample', 'change');
-    $text_submit = _('Enregistrer les modifications');
+    $text_submit = _('Save the changes');
     $hname = htmlspecialchars($values['name']);
     $hdesc = htmlspecialchars($values['desc']);
     $statements = DataMod::getSelectionCompo($values['name'], $_SESSION['bd_id']);
@@ -523,7 +523,7 @@ public static function showStatementsLists($statements) {
             echo <<<END
             <table class="table table-striped table-bordered data_list">
                                  <thead><tr>
-                                 <th class="header yellow">Nom</th>
+                                 <th class="header yellow">Name</th>
                                                <th class="header green">Description</th>
                                                              <th class="header blue">Type</th>
                                                                            </tr></thead>
@@ -542,7 +542,7 @@ END;
         } else {
             echo <<<END
             <div class="alert  alert-block alert-warning">
-                               <p>Il n'y a aucun relevé pour l'instant.</p>
+                               <p>There is no statement.</p>
                                </div>
 
                                    
@@ -574,7 +574,7 @@ END;
         } else {
             echo <<<END
             <div class="alert  alert-block alert-warning">
-                               <p>Il n'y a aucun relevé pour l'instant.</p>
+                               <p>There is no statement.</p>
                                </div>
 
                                    
@@ -593,24 +593,24 @@ END;
         $hdesc = htmlspecialchars($desc);
         echo <<<END
         <div class="alert alert-block alert-warning">
-                           <p>Veuillez confirmer la suppression du relevé. La suppression est définitive.</p>
-                           <h4>Description du relevé</h4>
+                           <p>Do you really want to delete this statement?</p>
+                           <h4>Description</h4>
                            <p><em>$hdesc</em></p>
                            </div>
                            <div class="well">
 
                                               
 END;
-        self::showButton($url_back, 'info', 'Annuler', 'back');
-        self::showButton($url_confirm, 'danger float_right', 'Supprimer', 'del');
+        self::showButton($url_back, 'info', 'Cancel', 'back');
+        self::showButton($url_confirm, 'danger float_right', 'Delete', 'del');
         echo '</div>';
     }
 
 
     public static function showDisplayViewChoiceTitle() {
         echo <<<END
-        <h3>Visualiser ce relevé directement
-        <small>Choisissez le type de visualisation désiré</small></h3>
+        <h3>Visualize the statement
+        <small>Choose your visualization</small></h3>
 
         
 END;
@@ -637,8 +637,8 @@ END;
         echo <<<END
 
 	<ul class="nav nav-tabs">
-	  <li><a href="$addsel">Nouvel extrait</a></li>
-	  <li><a href="$add">Nouvelle sélection</a></li>
+	  <li><a href="$addsel">New sample</a></li>
+	  <li><a href="$add">New selection</a></li>
 	</ul>
 END;
 
@@ -649,8 +649,8 @@ END;
         echo <<<END
 
 	<ul class="nav nav-tabs">
-	  <li><a href="$addsel">Nouvel extrait</a></li>
-	  <li><a href="$add">Nouvelle sélection</a></li>
+	  <li><a href="$addsel">New sample</a></li>
+	  <li><a href="$add">New selection</a></li>
 	</ul>
 END;
 
@@ -665,19 +665,19 @@ END;
         $hdata_type = htmlspecialchars($data_type->name);
 
         echo <<<END
-        <h3>Informations du relevé $name</h3>
+        <h3>Statement's datas $name</h3>
         <div class="well">
                            <dl>
-                           <dt>Type de données</dt>
+                           <dt>Type of datas</dt>
                            <dd>$hdata_type</dd>
-                           <dt>Statistiques</dt>
+                           <dt>Statistics</dt>
 
                               
 END;
         if (empty($data) || $data['count(*)'] == 0) {
-            echo "<dd>Ce relevé est vide.</dd></dl>\n";
+            echo "<dd>This statement is empty.</dd></dl>\n";
         } else {
-            echo "<dd>Ce relevé contient ${data['count(*)']} enregistrements.</dd>\n</dl>\n";
+            echo "<dd>This statetement has ${data['count(*)']} datas recorded.</dd>\n</dl>\n";
         }
 
         echo <<<END

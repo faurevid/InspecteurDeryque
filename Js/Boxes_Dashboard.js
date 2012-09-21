@@ -67,9 +67,8 @@ $(document).ready(function() {
 	var create_perfect_box = function() {
 		var box = layout.createBox();
 
-		// var data = document.createElement('div');
-		// data.className = 'data';
-		// box.back.appendChild(data);
+		// Multi mod disabled by default
+		box.box.setAttribute('data-multi-mod', 'false');
 
 		var color = get_random_color();
 		var dark_color = color.substr(0, color.length-3)+'25%';
@@ -105,8 +104,10 @@ $(document).ready(function() {
 		statements_list.appendChild(table_statements);
 		layout.disableDrag(table_statements);
 
-		var separate_button = newDom('div', 'btn btn-small btn-danger separate_button');
-		addText(separate_button, 'Bouton magique');
+		var separate_button = newDom('div', 'btn btn-small btn-primary separate_button');
+		separate_button.setAttribute('data-toggle', 'button');
+		// separate_button.appendChild(newDom('i', 'icon-white icon-th-large'));
+		addText(separate_button, ' Plein de petites boites');
 		statements_list.appendChild(separate_button);
 		layout.disableDrag(separate_button);
 
@@ -129,7 +130,24 @@ $(document).ready(function() {
 
 		// Separate button
 		$(separate_button).click(function() {
-			console.log("lapin", box);
+
+			// Get the current mod
+			var multi_mod = box.box.getAttribute('data-multi-mod') === 'true';
+
+			// Get selected simple statements (multi statements are ignored)
+			var boutons = $(table_statements).find('.simple_statements_list input:checked');
+
+			// Disable all statements
+			boutons.click();
+
+			// Remove all iframe (a bug could be present, so, act like a warrior)
+			$(box.front).find('iframe').remove();
+
+			// Change the mod
+			box.box.setAttribute('data-multi-mod', multi_mod ? 'false' : 'true');
+
+			// And re-enable selected statements
+			boutons.click();
 		});
 
 		box.back.appendChild(statements_list);
@@ -196,6 +214,7 @@ $(document).ready(function() {
 				button_user.hide();
 				back_buttons_bar.removeClass('buttons_caches');
 			}
+			dashboard_structure_management();
 		});
 
 
@@ -248,6 +267,11 @@ $(document).ready(function() {
 			var r = {};
 			var contents = [];
 
+			var multi_mod = box.getAttribute('data-multi-mod') === 'true';
+
+			if (multi_mod)
+				visualization += '_m';
+
 			back.find('.statements_list .table_statements input:checked').each(function()
 			{
 				contents.push(this.getAttribute('value'));
@@ -259,12 +283,70 @@ $(document).ready(function() {
 
 	};
 
+	var manage_all_box_sizes = function() {
+		$('.boxdiv').each(function() {
+			var jthis = $(this);
+			var width = jthis.width();
+			var height = jthis.height();
+
+			if (height < 190)
+				jthis.addClass('small-height');
+			else
+				jthis.removeClass('small-height');
+
+			if (width < 350)
+				jthis.addClass('small-width');
+			else
+				jthis.removeClass('small-width');
+
+			var iframes = jthis.find('iframe');
+			var sqrt_nb_iframes = Math.sqrt(iframes.length);
+
+			// If the the ceil is vertical, make more lines
+			if (width < height)
+			{
+				var nb_lines = Math.ceil(sqrt_nb_iframes);
+				var nb_columns = Math.round(sqrt_nb_iframes);
+			}
+			else
+			{
+				var nb_lines = Math.round(sqrt_nb_iframes);
+				var nb_columns = Math.ceil(sqrt_nb_iframes);
+			}
+
+			var n_line = 0;
+			var n_column = 0;
+			var iframe_width = width / nb_columns;
+			var iframe_height = height / nb_lines;
+
+			iframes.each(function() {
+
+				this.style.top = n_line * iframe_height + 'px';
+				this.style.left = n_column * iframe_width + 'px';
+
+				this.style.width = iframe_width + 'px';
+				this.style.height = iframe_height + 'px';
+
+				if (++n_column === nb_columns)
+				{
+					n_column = 0;
+
+					if (++n_line === nb_lines)
+						n_line = 0;
+				}
+			});
+		});
+	};
+
 	var disable_dashboard_structure_management = 0;
 	var dashboard_structure_management = function() {
+		manage_all_box_sizes();
 		if (!disable_dashboard_structure_management)
 		{
 			var s = create_structure_representation(layout.rootContainer);
-			window.location.hash = JsURL.stringify(s);
+
+			window.location.hash = (layout.front ? 'f' : 'b')
+				+ JsURL.stringify(s);
 		}
 	};
 
@@ -312,6 +394,17 @@ $(document).ready(function() {
 		layout.visual_drag.style.left = e.clientX-13+'px';
 		layout.visual_drag.style.background = box.getAttribute('cadreur_color');
 	});
+
+	var create_visualization_iframe = function(id, url, statement_name)
+	{
+		var iframe = newDom('iframe');
+		iframe.id = id;
+		iframe.className = 'visualization';
+		iframe.setAttribute('name', id);
+		iframe.setAttribute('data-statement-name', statement_name);
+		iframe.setAttribute('src', url);
+		return iframe;
+	};
 
 	// Statements list management
 	var json_statements_list = null;
@@ -361,7 +454,6 @@ $(document).ready(function() {
 
 		simple.appendChild(simpleHeading);
 		simple.appendChild(simpleBody);
-		list.append(simple);
 
 		var multi = newDom('div', 'accordion-group multi_statements_list');
 
@@ -403,7 +495,6 @@ $(document).ready(function() {
 		multiHeading.appendChild(buttonMulti);
 		multi.appendChild(multiHeading);
 		multi.appendChild(multiBody);
-		list.append(multi);
 
 
 		var sample = newDom('div', 'accordion-group samples_list');
@@ -424,47 +515,30 @@ $(document).ready(function() {
 				var tr = newDom('tr');
 				var td_a = newDom('td');
 				var input = newDom('input');
-				input.setAttribute('type','checkbox');
+				input.setAttribute('name', 'sample');
+				input.setAttribute('type', 'radio');
 				input.value = report;
 				td_a.appendChild(input);
 				var td_b = newDom('td');
 				td_b.appendChild(document.createTextNode(report));
-				tr.setAttribute('data-statements', JSON.stringify(json_statements_list['samples'][report].statements))
+				tr.setAttribute('data-begin', json_statements_list['samples'][report].begin);
+				tr.setAttribute('data-end', json_statements_list['samples'][report].end);
 				tr.appendChild(td_a);
 				tr.appendChild(td_b);
 				//li.onclick = clic_statement;
 				sampleTable.appendChild(tr);
 		    }
 		}
-		/*for (var report in json_statements_list)
-		{
-		    if (typeof json_statements_list[report] === 'object' && json_statements_list[report].releve == 'sample' )
-		    {
-			var tr = newDom('tr');
-			var td_a = newDom('td');
-			var input = newDom('input');
-			input.setAttribute('type','checkbox');
-			input.value = report;
-			td_a.appendChild(input);
-			var td_b = newDom('td');
-			td_b.appendChild(document.createTextNode(report));
-			tr.appendChild(td_a);
-			tr.appendChild(td_b);
-			//li.onclick = clic_statement;
-			sample.appendChild(tr);
-		    }
-		}*/
 		var buttonSample = newDom('button');
 		buttonSample.appendChild(document.createTextNode('Samples'));
 		buttonSample.setAttribute('class', 'btn');
 		buttonSample.setAttribute('data-toggle', 'collapse');
 		buttonSample.setAttribute('data-parent', '#'+id);
-		buttonSample.setAttribute('data-target', '#'+id_multi);
+		buttonSample.setAttribute('data-target', '#'+id_sample);
 
 		sampleHeading.appendChild(buttonSample);
 		sample.appendChild(sampleHeading);
 		sample.appendChild(sampleBody);
-		list.append(sample);
 	/*
 		var buttonSampleMul = newDom('button');
 		buttonSampleMul.setAttribute('class', 'btn btn-danger');
@@ -496,6 +570,10 @@ $(document).ready(function() {
 		}
 		list.append(samplemulti);*/
 
+		// Add multi statements and simple statements
+		list.append(multi);
+		list.append(simple);		
+		list.append(sample);
 
 		// Click on a statement
 		$(multi).find('tr').click(function(e){
@@ -539,13 +617,89 @@ $(document).ready(function() {
 
 			var checked = checkbox.attr('checked') === 'checked';
 			var box = checkbox.parents('.boxdiv');
+			var front = box.children('.front');
+
+			var li_statement_type = box.find('.input_types li.selected');
 			var box_name = box.find('iframe').attr('id');
 			var statement_name = checkbox.attr('value');
 
-			EventBus.send((checked ? 'add': 'del') +'_statement',
-				{statement_name: statement_name, box_name: box_name});
+			var type = encodeURIComponent(li_statement_type.attr('name'));
+			var url = URLS_DICTIONNARY.display_load.replace('__TYPE__', type);
+
+			var multi_mod = box.attr('data-multi-mod') === 'true';//find('.separate_button').hasClass('active');
+
+			var id = 'f'+box.attr('id')+
+					Math.abs((type+
+						(multi_mod ? statement_name : 'commun')).hashCode());
+
+			var iframe = byId(id);
+
+			if (checked && !iframe)
+			{
+				iframe = create_visualization_iframe(id, url, (multi_mod ? statement_name : 'commun'));
+
+				front.append(iframe);
+
+				$(iframe).one('load', function() {
+					iframe.setAttribute('data-first-loaded', true);
+					EventBus.send('add_statement',
+						{statement_name: statement_name, box_name: id});
+
+					EventBus.send('size_change');
+					EventBus.send('get_bounds');
+				});
+			}
+			else if (!checked && iframe)
+			{
+				if (multi_mod)
+				{
+					$(iframe).remove();
+				}
+
+				EventBus.send('del_statement',
+					{statement_name: statement_name, box_name: box_name});
+			}
+			else if (!multi_mod && iframe)
+			{
+				if (iframe.getAttribute('data-first-loaded'))
+				{
+					EventBus.send((checked ? 'add' : 'del')+'_statement',
+						{statement_name: statement_name, box_name: box_name});
+				}
+				else
+				{
+					$(iframe).one('load', function() {
+						EventBus.send((checked ? 'add' : 'del')+'_statement',
+							{statement_name: statement_name, box_name: box_name});
+					});
+				}
+			}
+			else
+			{
+				EventBus.send('log', {
+					status: "Unknown action in statements list",
+					message: "Nothing to do. checked : "+checked+
+					"\tiframe : "+iframe+"\tmulti_mod : "+multi_mod
+				});
+			}
 
 			dashboard_structure_management();
+		});
+		$(sample).find('tr').click(function(e){
+			var checkbox = $(this).find('input');
+
+			// If the click is on the cell, and not on the checkbox
+			if(e && e.originalEvent && ((e.originalEvent.target && e.originalEvent.target.nodeName !== 'INPUT') ||
+				(e.originalEvent.srcElement && e.originalEvent.srcElement.nodeName !== 'INPUT'))) {
+				checkbox.attr('checked', checkbox.attr('checked') !== 'checked');
+			}
+			
+			var checked = checkbox.attr('checked') === 'checked';
+			if(checked){
+				var begin = parseInt(this.getAttribute('data-begin'));
+				var end = parseInt(this.getAttribute('data-end'));
+				EventBus.send('time_sync', {start_t: begin, end_t: end});
+			}
 		});
 	};
 
@@ -559,37 +713,48 @@ $(document).ready(function() {
 		var boxdiv = li.parents('.boxdiv');
 		var front = boxdiv.children('.front');
 		var url = URLS_DICTIONNARY.display_load.replace('__TYPE__', type);
-		var id = 'f' + Math.abs((boxdiv.attr('id')+type).hashCode());
 
-		var iframe = byId(id);
-		// If the iframe have changed
-		if (!iframe)
-		{
-			// Remove the old iframe
-			var other_frames = front.find('iframe');
-			other_frames.remove();
+		var multi_mod = boxdiv.attr('data-multi-mod') === 'true';//find('.separate_button').hasClass('active');
 
-			// Create the new iframe
-			iframe = newDom('iframe');
-			iframe.setAttribute('src', url);
-			iframe.id = id;
-			iframe.setAttribute('name', id);
-			front.append(iframe);
+		front.children('iframe').each(function() {
+			var statement_name = this.getAttribute('data-statement-name');
+			var id = 'f'+boxdiv.attr('id')+Math.abs((type+statement_name).hashCode());
 
-			// Inform the iframe (and all other elements too) that we have selected some
-			// statements
-			$(iframe).load(function() {
-				boxdiv.find('.back .statements_list .simple_statements_list input:checked').each(function() {
-					EventBus.send('add_statement',
-						{statement_name: $(this).attr('value'), box_name: id}
-					);
-					EventBus.send('size_change');
-					EventBus.send('get_bounds');
-				});
-			});
-		}
+			// If the type of the iframe need te be changed
+			if (this.id !== id)
+			{
+				$(this).remove();
 
-		iframe.className = 'visualization';
+				var iframe = create_visualization_iframe(id, url, statement_name);
+
+				front.append(iframe);
+
+				if (multi_mod)
+				{
+					$(iframe).one('load', function() {
+						iframe.setAttribute('data-first-loaded', true);
+						EventBus.send('add_statement',
+							{statement_name: statement_name, box_name: id}
+						);
+						EventBus.send('size_change');
+						EventBus.send('get_bounds');
+					});
+				}
+				else
+				{
+					$(iframe).one('load', function() {
+						iframe.setAttribute('data-first-loaded', true);
+						boxdiv.find('.back .statements_list .simple_statements_list input:checked').each(function() {
+							EventBus.send('add_statement',
+								{statement_name: $(this).attr('value'), box_name: id}
+							);
+							EventBus.send('size_change');
+							EventBus.send('get_bounds');
+						});
+					});
+				}
+			}
+		});
 
 		dashboard_structure_management();
 	};
@@ -731,7 +896,7 @@ $(document).ready(function() {
 	{
 		// First box
 		try{
-			var hash_location_object = JsURL.parse(window.location.hash.substr(1));
+			var hash_location_object = JsURL.parse(window.location.hash.substr(2));
 		}
 		catch(e) {}
 	}
@@ -742,6 +907,7 @@ $(document).ready(function() {
 	var recursive_layout_creation = function(data, parent) {
 		for (var d in data)
 		{
+			// TODO composition
 			if (d === 'h' || d === 'v')
 			{
 				var d = (typeof data.h !== 'undefined') ? 'h' : 'v';
@@ -772,6 +938,18 @@ $(document).ready(function() {
 					var box = create_perfect_box();
 					layout.addBox(box, parent);
 					var jbox = $(box);
+
+					if (d.substr(-2) === '_m')
+					{
+						var name = d.substr(0, d.length - 2);
+						box.setAttribute('data-multi-mod', 'true');
+						jbox.find('.separate_button').addClass('active');
+					}
+					else
+					{
+						var name = d;
+					}
+
 					var intervalle = window.setInterval(
 						function() {
 							var selected = jbox.find('li.selected');
@@ -779,7 +957,7 @@ $(document).ready(function() {
 							{
 								window.clearInterval(intervalle);
 								jbox.find('.input_types li').each(function() {
-									if (this.getAttribute('name') == d)
+									if (this.getAttribute('name') == name)
 										$(this).click();
 								});
 
@@ -822,16 +1000,25 @@ $(document).ready(function() {
 		// Show the back side of the inspecteur deryque by default
 		$(button).click();
 	}
+	else if (window.location.hash && window.location.hash[1] === 'b')
+		$(button).click();
 
 	// Equilibrate in setTimeout for trigger CSS3 transitions
-	setTimeout(function(){layout.equilibrate();}, 1);
+	// setTimeout(function(){layout.equilibrate();}, 1); // disabled for performances
+	layout.equilibrate();
+	manage_all_box_sizes();
 
 	// 600 is the duration of the layout's transitions
 	$.event.special.debouncedresize.threshold = 600;
 	$(window).on('debouncedresize',function()
 	{
+		manage_all_box_sizes();
+
 		EventBus.send('size_change');
 	});
 
-	setTimeout(function(){EventBus.send('size_change');}, 600);
+	setTimeout(function(){
+		manage_all_box_sizes();
+		EventBus.send('size_change');
+	}, 600);
 });

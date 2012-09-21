@@ -4,21 +4,21 @@
  */
 class DataSample {
     public function index() {
-        CNavigation::setTitle('Gestion des extraits de relevés');
+        CNavigation::setTitle('Samples');
 
         $statements = DataMod::getStatementComp($_SESSION['bd_id']);
         $state = DataMod::getStatementCompWhot($_SESSION['bd_id']);
         $statement = DataMod::getStatementCompMulti($_SESSION['bd_id']);
 	echo <<<END
-		    <b>Extraits de relevés simples</b>
+		    <b>From simple statements</b>
 END;
         DataSampleView::showStatementsList($statements);
 	echo <<<END
-		    <b>Extraits de relevés multiples </b>
+		    <b>From multi statements </b>
 END;
         DataSampleView::showStatementsList($state);
 	echo <<<END
-		    <b>Extraits multiples</b>
+		    <b>Multi samples</b>
 END;
         DataSampleView::showStatementsLists($statement);
 
@@ -26,8 +26,8 @@ END;
     }
 
     public function choose() {
-        CNavigation::setTitle('Nouvel extrait de relevé');
-        CNavigation::setDescription('Sélectionnez le relevé que vous souhaitez utiliser');
+        CNavigation::setTitle('New sample');
+        CNavigation::setDescription('Choose the statement that you want to use');
         DataSampleView::showAddForm();
         DataSampleView::showBackButtons(
             CNavigation::generateUrlToApp('Data'));
@@ -37,11 +37,11 @@ END;
 
         if (CNavigation::isValidSubmit(array('name'), $_REQUEST)) {
             if (R::findOne('composition', 'name = ? and user_id = ?', array($_REQUEST['name'], $_SESSION['bd_id']))) {
-                new CMessage('Un relevé existe déjà avec le même nom', 'error');
+                new CMessage('A statement already exists with the same name', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
-            } 
+	    }
 	    else if(!(isset($_POST['releve'])) and count($_POST['releve']) < 1){
-		new CMessage('Vous devez selectionner au moins une sélection', 'error');
+		new CMessage('You have to choose at least one selection', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
 
 		} else {
@@ -54,7 +54,7 @@ END;
 		$statement->releve_type='releve';
 
                 R::store($statement);
-		
+
                 foreach($tab_releve as $rel){
                 	$stat = R::load('selection', $rel);
 				$state=R::dispense('selection');
@@ -65,10 +65,10 @@ END;
 				$state->end=$stat['end'];
 				$state->composition_id=$statement['id'];
 				R::store($state);
-				
+
 		}
 
-                new CMessage('Relevé correctement ajouté');
+                new CMessage('Statement successfully added');
 
                 CNavigation::redirectToApp('Data');
 
@@ -83,11 +83,11 @@ END;
 
         if (CNavigation::isValidSubmit(array('name'), $_REQUEST)) {
             if (R::findOne('composition', 'name = ? and user_id = ?', array($_REQUEST['name'], $_SESSION['bd_id']))) {
-                new CMessage('Un relevé existe déjà avec le même nom', 'error');
+                new CMessage('A statement already exists with the same name', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
-            } 
+            }
 	    else if(!(isset($POST['releve'])) and count($_POST['releve']) < 1){
-		new CMessage('Vous devez selectionner au moins une sélection', 'error');
+		new CMessage('You have to choose at least one selection', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
 
 		} else {
@@ -100,7 +100,7 @@ END;
 		$statement->releve_type='multi_releve';
 
                 R::store($statement);
-		
+
                 foreach($tab_releve as $rel){
                 	$stat = R::load('selection', $rel);
 				$state=R::dispense('selection');
@@ -111,10 +111,10 @@ END;
 				$state->end=$stat['end'];
 				$state->composition_id=$statement['id'];
 				R::store($state);
-				
+
 		}
 
-                new CMessage('Relevé correctement ajouté');
+                new CMessage('Statement successfully added');
 
                 CNavigation::redirectToApp('Data');
 
@@ -129,7 +129,7 @@ END;
     public function addSelect() {
         if (CNavigation::isValidSubmit(array('name'), $_REQUEST)) {
             if (R::findOne('selection', 'name = ? and releve_id = ?', array($_REQUEST['name'], $_REQUEST['id_rel']))) {
-                new CMessage('Un relevé existe déjà avec le même nom', 'error');
+                new CMessage('A statement already exists with the same name', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
             } else {
 
@@ -143,10 +143,10 @@ END;
 
                 R::store($statement);
 
-                new CMessage('Sélection correctement ajoutée');
+                new CMessage('Selection successfully added');
 
                 CNavigation::redirectToApp('DataSample', 'choose');
-  
+
                 return;
             }
 
@@ -159,7 +159,7 @@ END;
         if (CNavigation::isValidSubmit(array('name'), $_REQUEST)) {
 
             if (R::findOne('selection', 'name = ? and releve_id = ?', array($_REQUEST['name'], $_REQUEST['id_rel']))) {
-                new CMessage('Un relevé existe déjà avec le même nom', 'error');
+                new CMessage('A statement already exists with the same name', 'error');
 		CNavigation::redirectToApp('DataSample', 'choose');
             } else {
 
@@ -173,10 +173,10 @@ END;
 
                 R::store($statement);
 
-                new CMessage('Sélection correctement ajoutée');
+                new CMessage('Selection successfully added');
 
                 CNavigation::redirectToApp('DataSample', 'choose');
-  
+
                 return;
             }
 
@@ -190,11 +190,11 @@ END;
 
         if (CNavigation::isValidSubmit(array('name','desc'), $_REQUEST)) {
             if (R::findOne('multi_extrait', 'name = ? and user_id = ?', array($_REQUEST['name'], $_SESSION['bd_id']))) {
-                new CMessage('Un multi extrait existe déjà avec le même nom', 'error');
+                new CMessage('A multi sample already exists with the same name', 'error');
 		CNavigation::redirectToApp('DataSample', 'choosemulti');
-            } 
+            }
 	    else if(!(isset($POST['releve'])) and count($_POST['releve']) < 1){
-		new CMessage('Vous devez sélectionner au moins un extrait', 'error');
+		new CMessage('You have to choose at least one sample', 'error');
 		CNavigation::redirectToApp('DataSample', 'choosemulti');
 
 		} else {
@@ -207,7 +207,7 @@ END;
                 $statement->description = $_REQUEST['desc'];
 
                 R::store($statement);
-		
+
 		$tab_releve = $_POST['releve'];
                 foreach($tab_releve as $rel){
                 	$stat = R::dispense('multi_releve_extrait');
@@ -216,7 +216,7 @@ END;
 			R::store($stat);
 		}
 
-                new CMessage('Relevé correctement ajouté');
+                new CMessage('Statement successfully added');
 
                 CNavigation::redirectToApp('Data');
 
@@ -229,29 +229,29 @@ END;
     }
 
 	public function view() {
-	
+
 	$statements = isset($_REQUEST['name']) ? DataMod::getCompo($_REQUEST['name']) : false;
 
   	if (!$statements) {
             CTools::hackError();
         }
-	CNavigation::setTitle('Extrait «'.$_REQUEST['name'].'»');
+	CNavigation::setTitle('Sample «'.$_REQUEST['name'].'»');
         DataSampleView::showViewButtons(
             CNavigation::generateUrlToApp('Data'),
             CNavigation::generateMergedUrl('DataSample', 'choosechange'),
 	    CNavigation::generateUrlToApp('DataSample', 'choosemulti'),
 	    CNavigation::generateUrlToApp('DataSample', 'remove', array('name' => $_REQUEST['name'])));
-	
+
 	}
 
 	public function viewmu() {
-	
+
 	$statements = isset($_REQUEST['name']) ? DataMod::getMultiCompo($_REQUEST['name'], $_SESSION['bd_id']) : false;
 
   	if (!$statements) {
             CTools::hackError();
         }
-	CNavigation::setTitle('Extrait «'.$_REQUEST['name'].'»');
+	CNavigation::setTitle('Sample «'.$_REQUEST['name'].'»');
         DataSampleView::showViewButtons(
             CNavigation::generateUrlToApp('Data'),
             CNavigation::generateMergedUrl('DataSample', 'choosechange'),
@@ -260,8 +260,8 @@ END;
 	}
 
 	public function choosemulti() {
-        CNavigation::setTitle('Nouveau multi relevé extrait');
-        CNavigation::setDescription('Sélectionnez les extraits que vous souhaitez composer');
+        CNavigation::setTitle('New sample');
+        CNavigation::setDescription('Choose the samples that you want to use');
 
         DataSampleView::showMultiForm(array(
                                        'name' => '',
@@ -273,19 +273,19 @@ END;
 	public function change() {
 
 	    if (CNavigation::isValidSubmit(array('name','desc'), $_REQUEST)) {
-            
+
 	    if(!isset($_POST['releve']) || count($_POST['releve']) < 1){
-		new CMessage('Vous devez sélectionner au moins une sélection', 'error');
+		new CMessage('You have to choose at least one selection', 'error');
 		CNavigation::redirectToApp('DataSample', 'choosechange', array('name' => $_REQUEST['name']));
 
-	     } else {	
-		
+	     } else {
+
 		$state = DataMod::getStatementComp($_REQUEST['name'], $_SESSION['bd_id']);
 		$state = R::load('multi_releve', $state['id']);
 		$state->description = $_REQUEST['desc'];
 
 		R::store($state);
-		
+
 		$multi = DataMod::getMultiRelRel($_SESSION['bd_id'], $state['id']);
 		foreach($multi as $mult){
 			$mul = R::load('multi_releve_releve', $mult['id']);
@@ -300,7 +300,7 @@ END;
 		    R::store($stat);
 		}
 
-		new CMessage('Relevé correctement modifié');
+		new CMessage('Statement successfully updated');
 
 		CNavigation::redirectToApp('Data');
 
@@ -313,12 +313,12 @@ END;
 
     public function viewRel() {
 		$statement = isset($_REQUEST['name']) ? DataMod::getStatement($_REQUEST['name'], $_SESSION['bd_id']) : false;
-		
+
 		if (!$statement) {
 			CTools::hackError();
 		}
 
-		CNavigation::setTitle('Relevé «'.$statement['name'].'»');
+		CNavigation::setTitle('Statement «'.$statement['name'].'»');
 		DataSampleView::showStatement();
 		DataSampleView::showRelForm($statement['name'] , array('type' => 'releve'));
 
@@ -328,11 +328,11 @@ END;
 
     public function viewRelMulti() {
         	$statements = isset($_REQUEST['name']) ? DataMod::getStatementMulti($_REQUEST['name'], $_SESSION['bd_id']) : false;
-		
+
 		if (!$statements) {
 			CTools::hackError();
 		}
-		CNavigation::setTitle('Relevé «'.$statements['name'].'»');
+		CNavigation::setTitle('Statement «'.$statements['name'].'»');
 		DataSampleView::showStatementMulti();
 		DataSampleView::showRelMultiForm($statements['name'], array('type'=>'multi_releve'));
 
@@ -343,12 +343,12 @@ END;
 
     public function viewSelect() {
 		$statement = isset($_REQUEST['name']) ? DataMod::getStatement($_REQUEST['name'], $_SESSION['bd_id']) : false;
-		
+
 		if (!$statement) {
 			CTools::hackError();
 		}
 
-		CNavigation::setTitle('Relevé «'.$statement['name'].'»');
+		CNavigation::setTitle('Statement «'.$statement['name'].'»');
 		DataSampleView::showStatement();
 		DataSampleView::showSelectForm($statement['name']);
 
@@ -358,11 +358,11 @@ END;
 
     public function viewSelectMulti() {
         	$statements = isset($_REQUEST['name']) ? DataMod::getStatementMulti($_REQUEST['name'], $_SESSION['bd_id']) : false;
-		
+
 		if (!$statements) {
 			CTools::hackError();
 		}
-		CNavigation::setTitle('Relevé «'.$statements['name'].'»');
+		CNavigation::setTitle('Statement «'.$statements['name'].'»');
 		DataSampleView::showStatementMulti();
 		DataSampleView::showSelectMultiForm($statements['name']);
 
@@ -382,7 +382,7 @@ END;
             R::trash(R::load('multi_extrait', $stat['id']));
             CNavigation::redirectToApp('Data');
         } else {
-            CNavigation::setTitle('Suppression du relevé «'.$statement['name'].'»');
+            CNavigation::setTitle('Deleting the statement «'.$statement['name'].'»');
             CNavigation::setDescription('Consequences will never be the same!');
 
            DataSampleView::showRemoveForm(
@@ -408,7 +408,7 @@ END;
 		}
 		else
 		{
-			CNavigation::setTitle('Suppression du relevé «'.$_REQUEST['name'].'»');
+			CNavigation::setTitle('Deleting the statement «'.$_REQUEST['name'].'»');
 			CNavigation::setDescription('Consequences will never be the same!');
 
            DataSampleView::showRemoveForm(
@@ -420,14 +420,14 @@ END;
     }
 
     public function choosechange() {
-        CNavigation::setTitle('Modifier l\'extrait');
-        CNavigation::setDescription('Sélectionnez les sélections que vous souhaitez ajouter');
+        CNavigation::setTitle('Updating the sample');
+        CNavigation::setDescription('Choose the selections that you want to add');
 	$desc = DataMod::getDescMulti($_REQUEST['name'], $_SESSION['bd_id']);
 	DataSampleView::showChangeForm(array(
                                        'name' => $_REQUEST['name'],
                                        'desc' => $desc["description"]));
 	DataSampleView::showBackButtons(CNavigation::generateUrlToApp('Data'));
-        
+
     }
 
 

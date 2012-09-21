@@ -50,9 +50,10 @@ bottom:0;
 right:0;
 overflow:auto;
 }
-/*.boxdiv .front {
-background:white;
-}*/
+
+.boxdiv .front {
+	/*overflow:hidden;*/
+}
 
 .boxdiv .back {
 padding:4px;
@@ -169,7 +170,7 @@ left:220px;
 
 .boxdiv .back .statements_list .table_statements {
 	position:absolute;
-	top:100px;
+	top:75px;
 	width:195px;
 	left:0px;
 	bottom:20px;
@@ -267,12 +268,72 @@ color:blue;
 	margin:auto;
 }
 
+.boxdiv .back h2 {
+	font-size:25px;
+	margin:5px 0 10px 0;
+	line-height:28px;
+}
+
+/* small box management */
+.boxdiv.small-height .back h2 {
+	font-size:20px;
+	margin:5px 0 10px 0;
+	line-height:24px;
+}
+
+.boxdiv.small-height .back .statements_list {
+	overflow-y:auto;
+}
+.boxdiv.small-height .back .statements_list .table_statements{
+	overflow-y:visible;
+	width:185px;
+}
+
+.boxdiv.small-height .back .statements_list .separate_button {
+position:static;
+margin-top:2px;
+margin-bottom:2px;
+}
+
+.boxdiv.small-width .back .input_types li img {
+	max-width:50px;
+}
+
+.boxdiv.small-width .back .statements_list {
+	width:145px;
+}
+
+.boxdiv.small-width .back .input_types {
+	left:168px;
+}
+
+.boxdiv.small-width .back .statements_list table,
+.boxdiv.small-width .back .statements_list .table_statements {
+	width:134px;
+}
+.boxdiv.small-width .back .statements_list .input_filter {
+	width:119px;
+}
+.boxdiv.small-width .back .statements_list button {
+	width:125px;
+}
+.boxdiv.small-width .back .statements_list .separate_button {
+	width:113px;
+}
+.boxdiv.small-width .back h2 {
+	overflow:hidden;
+
+}
+
 .boxdiv iframe.visualization {
-width:100%;
-height:100%;/*400px;*/
+/*width:100%;
+height:100%;/*400px;
+*/
+/*background:blue;*/
 border:none;
 display:block;
 overflow-y:hidden;
+position:absolute;
 }
 
 .boxdiv .back .close {

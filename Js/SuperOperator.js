@@ -416,7 +416,7 @@ send_selection: function(d, obj){
 
 			obj.ajax('newSelec/'+encodeURIComponent(d.name_s).replace('%2F','%1D')+'/'+d.min_s+'/'+d.max_s+ '/'+ d.statement_name, function(json){
 
-				alert("Sélection correctement ajoutée");
+				alert("Selection successfully added");
 				log(json);
 			});
 }

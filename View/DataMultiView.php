@@ -23,10 +23,12 @@ class DataMultiView extends AbstractView {
 		$label_name = _('Name');
 		$label_desc = _('Description');
 		$url_submit = CNavigation::generateUrlToApp('DataMulti', 'form');
-		$text_submit = _('Créer le relevé multiple');
+		$text_submit = _('Create the multiple statement');
 		$hname = htmlspecialchars($values['name']);
 		$hdesc = htmlspecialchars($values['desc']);
 		$statements = DataMod::getStatementsWithId();
+
+		$statements_name = [];
 
 		$autofocus_name = $mode === 'add' ? 'autofocus' : '';
 
@@ -50,12 +52,17 @@ HTML;
 			$hdescr = htmlspecialchars($statement['description']);
 			$hmodname = htmlspecialchars($statement['modname']);
 			$hid = htmlspecialchars($statement['id']);
-			if($statement['name'] == $_REQUEST['name']) $checked = 'checked';
+			if((isset($_REQUEST['name']) && $statement['name'] == $_REQUEST['name']) ||
+				in_array($statement['id'], $values['releve'])
+				)
+			{
+				$checked = 'checked';
+				array_push($statements_name, $statement['name']);
+			}
 			else $checked = '';
-			$checked2 = in_array($statement['id'], $values['releve']) ? 'checked' : '';
 			echo <<<HTML
 		<tr class="$checked">
-			<td><input type="checkbox" name="releve[]" value="$hid" $checked $checked2/></td>
+			<td><input type="checkbox" name="releve[]" value="$hid" $checked/></td>
 			<td class="name">$hsname</td>
 			<td>$hdescr</td>
 			<td>$hmodname</td>
@@ -69,13 +76,13 @@ HTML;
 	<div class="control-group">
 	   <label for ="input_name" class="control-label">$label_name</label>
 	   <div class="controls">
-			<input name="name" id="input_name" type="text" $autofocus_name required />
+			<input name="name" id="input_name" value="$hname" type="text" $autofocus_name required />
 		</div>
 	</div>
 	<div class="control-group">
 	   <label for ="input_desc" class="control-label">$label_desc</label>
 	   <div class="controls">
-			<textarea name="desc" id="input_desc"></textarea>
+			<textarea name="desc" id="input_desc">$hdescr</textarea>
 		</div>
 	</div>
 </fieldset>
@@ -87,8 +94,10 @@ HTML;
 
 		if ($mode === 'edit')
 		{
-			$url_view =	CNavigation::generateUrlToApp('').'#'.JsURL::stringify(
-				['h' => [['Graphique' => [$values['name']]]]]
+			array_push($statements_name, $values['name']);
+			$statements =
+			$url_view =	CNavigation::generateUrlToApp('').'#f'.JsURL::stringify(
+				['h' => [['LineChart_m' => $statements_name]]]
 				);
 			$url_del =	CNavigation::generateMergedUrl('DataMulti', 'remove');
 		        $url_ext = CNavigation::generateUrlToApp('DataSample', 'viewSelectMulti', array('name' => $values['name']));
@@ -157,7 +166,7 @@ HTML;
 			echo "</tbody></table>";
 		} else
 			echo '<div class="alert alert-block alert-warning">',
-				_('There are no multiple statements for the moment.'),'</div>';
+				_('There are no multiple statements at the moment.'),'</div>';
 	}
 
 	/**
@@ -167,7 +176,7 @@ HTML;
 	 * @param $url_back The url to not remove the statement and go back.
 	 */
 	public static function showRemoveForm($desc, $url_confirm, $url_back) {
-		$hmsg = _('Thanks to confirm your action.');
+		$hmsg = _('Do you really want to delete this statement?');
 		echo <<<HTML
 		<div class="alert alert-block alert-warning">
 						   <p>$hmsg</p>
