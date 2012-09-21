@@ -52,7 +52,7 @@ overflow:auto;
 }
 
 .boxdiv .front {
-	/*overflow:hidden;*/
+	overflow:hidden;
 }
 
 .boxdiv .back {
@@ -185,7 +185,7 @@ left:220px;
 	bottom:5px;
 }
 
-.boxdiv .back .statements_list td {
+.boxdiv .back .statement30list td {
 border:0;
 padding:2px 0px 2px 2px;
 margin:2px 0px 2px 0px;
@@ -383,7 +383,7 @@ user-select: none;
 cursor:pointer;
 overflow:hidden;
 position:absolute;
-left:210px;
+left:230px;
 top:0;
 right:0;
 bottom:0;
